@@ -1,0 +1,20 @@
+{
+  "name": "arkanoid",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node_modules/browserify/bin/cmd.js src/index.ts -p [ tsify ] --standalone arkanoid > public/arkanoid.js",
+    "start": "node_modules/watchify/bin/cmd.js src/index.ts -p [ tsify ] --standalone arkanoid -o public/arkanoid.js --debug --verbose"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/chai": "^3.4.34",
+    "browserify": "^13.1.1",
+    "rxjs": "^5.0.0-rc.2",
+    "tsify": "^2.0.2",
+    "typescript": "^2.0.7",
+    "watchify": "^3.7.0"
+  }
+}

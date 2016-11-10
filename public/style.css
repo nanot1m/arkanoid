@@ -1,0 +1,44 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    background: url("assets/blkstar.gif");
+    color: white;
+    display: flex;
+    font-family: monospace;
+    flex-direction: column;
+}
+
+.title {
+    display: flex;
+    justify-content: center;
+}
+
+h1 {
+    font-size: 40px;
+    text-transform: uppercase;
+    border-top: 4px solid whitesmoke;
+    border-bottom: 4px solid whitesmoke;
+    display: inline-block;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-top: -96px;
+}
+
+#arkanoid {
+    border: 2px solid whitesmoke;
+    background: black;
+    box-shadow: 0 3px 15px 1px rgba(255, 255, 255, 0.7);
+    border-radius: 15px;
+    width: 640px;
+    height: 480px;
+}
