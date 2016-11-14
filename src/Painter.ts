@@ -14,4 +14,8 @@ export class Painter {
     }
     paintProvider.paint(this.context, obj)
   }
+
+  clearCanvas(width: number, height: number) {
+    this.context.clearRect(0, 0, width, height)
+  }
 }

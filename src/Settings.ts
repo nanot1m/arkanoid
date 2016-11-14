@@ -11,5 +11,11 @@ export type Settings = {
   BRICK_HEIGHT: number,
 
   LINE_WIDTH: number,
-  STROKE_COLOR: string
+  LINE_COLOR: string,
+  FILL_COLOR: string,
+
+  BALL_SPEED: number,
+  PADDLE_SPEED: number,
+
+  FRAME_RATE: number
 }
