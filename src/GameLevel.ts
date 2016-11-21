@@ -3,7 +3,7 @@ import { Ball } from './GameObjects/Ball'
 import { Brick } from './GameObjects/Brick'
 import { Border } from './GameObjects/Border'
 import { Painter } from './Painter'
-import { Observable, Subscription, Scheduler } from 'rxjs'
+import { Observable, Subscription } from 'rxjs'
 import { Settings } from './Settings'
 import { SoundDriver } from './SoundDriver'
 
@@ -48,29 +48,40 @@ export class GameLevel {
   private borders: Border[]
   private gameSubscription: Subscription
 
-  constructor(bricks: Brick[], private painter: Painter, private settings: Settings) {
-    const { paddle, ball, borders } = this.createInitialObjects(settings)
+  constructor(
+    private bricks: Brick[],
+    private painter: Painter,
+    private settings: Settings,
+    private onWin?: () => void,
+    private onLoose?: () => void
+  ) {}
+
+  start() {
+    const { paddle, ball, borders } = this.createInitialObjects(this.settings)
     this.borders = borders
 
-    this.tick$ = createTick$(settings.FRAME_RATE)
+    this.tick$ = createTick$(this.settings.FRAME_RATE)
     this.input$ = createInput$()
-    this.paddle$ = createPaddle$(this.tick$, this.input$, paddle, settings)
+    this.paddle$ = createPaddle$(this.tick$, this.input$, paddle, this.settings)
 
     this.gameState$ = this.tick$
       .withLatestFrom(this.paddle$)
       .scan(({ ball, bricks, ballDirection }, [tick, paddle]) =>
         this.handleGameTick(
-          ball, tick, paddle, ballDirection,
-          bricks, borders, settings.BALL_SPEED
+          ball,
+          tick,
+          paddle,
+          ballDirection,
+          bricks,
+          borders,
+          this.settings.BALL_SPEED
         ), {
         ball,
-        bricks,
+        bricks: this.bricks,
         ballDirection: { x: -2, y: -2 },
         gameStatus: GameStatus.Play
       })
-  }
 
-  start() {
     this.gameSubscription = this.gameState$
       .subscribe(objects => {
         this.update(objects)
@@ -134,8 +145,9 @@ export class GameLevel {
     }
 
     if (possibleNextBall.collides(paddle)) {
+      const delta = (ball.x - paddle.x) / (paddle.width / 4)
       nextBallDirection.y *= -1
-      nextBallDirection.x += (ball.x - paddle.x) / (paddle.width / 4)
+      nextBallDirection.x += delta
       collisions.paddle = true
     }
 
@@ -210,12 +222,23 @@ export class GameLevel {
 
     if (gameStatus === GameStatus.Win) {
       this.dispose()
+      Observable
+        .interval(100)
+        .take(7)
+        .map(x => 48 + x)
+        .subscribe(SoundDriver.play)
       SoundDriver.play(50)
+      if (this.onWin) this.onWin()
     }
 
     if (gameStatus === GameStatus.Loose) {
       this.dispose()
-      SoundDriver.play(40)
+      Observable
+        .interval(100)
+        .take(7)
+        .map(x => 42 - x)
+        .subscribe(SoundDriver.play)
+      if (this.onLoose) this.onLoose()
     }
   }
 }

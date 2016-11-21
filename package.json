@@ -4,17 +4,23 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node_modules/browserify/bin/cmd.js src/index.ts -p [ tsify ] --standalone arkanoid > public/arkanoid.js",
-    "start": "node_modules/watchify/bin/cmd.js src/index.ts -p [ tsify ] --standalone arkanoid -o public/arkanoid.js --debug --verbose"
+    "build": "browserify src/index.ts -p [ tsify ] --standalone arkanoid > public/arkanoid.js",
+    "watch": "watchify src/index.ts -p [ tsify ] --standalone arkanoid -o public/arkanoid.js --debug --verbose",
+    "browsersync": "browser-sync start --server --ss ./public --files ./public/*.*",
+    "start": "npm run watch & npm run browsersync"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "rxjs": "^5.0.0-rc.2"
+  },
+  "devDependencies": {
     "@types/chai": "^3.4.34",
+    "browser-sync": "^2.18.2",
     "browserify": "^13.1.1",
     "rxjs": "^5.0.0-rc.2",
-    "tsify": "^2.0.2",
-    "typescript": "^2.0.7",
+    "tsify": "^2.0.3",
+    "typescript": "^2.0.10",
     "watchify": "^3.7.0"
   }
 }

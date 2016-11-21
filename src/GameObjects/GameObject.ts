@@ -4,12 +4,20 @@ export class GameObject {
   private boundingBoxOffsetX: number
   private boundingBoxOffsetY: number
 
-  constructor(readonly x: number, readonly y: number, public boundingBox: BoundingBox) {
-    this.boundingBoxOffsetX = x - boundingBox.x
-    this.boundingBoxOffsetY = y - boundingBox.y
+  boundingBox: BoundingBox
+
+  constructor(readonly x: number, readonly y: number, boundingBox?: BoundingBox) {
+    if (boundingBox) {
+      this.boundingBoxOffsetX = x - boundingBox.x
+      this.boundingBoxOffsetY = y - boundingBox.y
+      this.boundingBox = boundingBox
+    }
   }
 
   collides(obj: GameObject) {
+    if (!this.boundingBox) {
+      return false
+    }
     return BoundingBox.isCollide(this.boundingBox, obj.boundingBox)
   }
 

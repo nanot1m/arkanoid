@@ -9,8 +9,11 @@ import { Painter } from './Painter'
 import { GameLevel } from './GameLevel'
 import { Border } from './GameObjects/Border'
 import { SoundDriver } from './SoundDriver'
-import set = Reflect.set
-
+import { WelcomeScreen } from './WelcomeScreen'
+import { Text } from './GameObjects/Text'
+import { TextPaintProvider } from './PaintProviders/TextPaintProvider'
+import { WinScreen } from './WinScreen'
+import { LooseScreen } from './LooseScreen'
 
 export class Game {
   private context: CanvasRenderingContext2D
@@ -32,12 +35,13 @@ export class Game {
     this.setupContext()
     this.setupPainter()
     this.setupSoundDriver()
+    this.setupLevels()
 
-    this.startLevel(0)
+    this.showWelcome()
   }
 
   private startLevel(index: number) {
-    createLevel(this.painter, this.settings).start()
+    this.levels[index].start()
   }
 
   private setupCanvas() {
@@ -57,6 +61,7 @@ export class Game {
       .add(Paddle, RectPaintProvider)
       .add(Brick, RectPaintProvider)
       .add(Border, RectPaintProvider)
+      .add(Text, TextPaintProvider)
 
     this.painter = new Painter(this.context, paintProviders)
   }
@@ -77,9 +82,42 @@ export class Game {
       }
     })
   }
+
+  private setupLevels() {
+    const level0 = createLevel(
+      this.painter,
+      this.settings,
+      this.showWin.bind(this),
+      this.showLoose.bind(this)
+    )
+    this.levels = [
+      level0
+    ]
+  }
+
+  private showWelcome() {
+    this.painter.clearCanvas(this.settings.CANVAS_WIDTH, this.settings.CANVAS_HEIGHT)
+    new WelcomeScreen(
+      this.painter,
+      this.settings,
+      () => this.startLevel(0)
+    ).show()
+  }
+
+  private showWin() {
+    this.painter.clearCanvas(this.settings.CANVAS_WIDTH, this.settings.CANVAS_HEIGHT)
+    new WinScreen(this.painter, this.settings).show()
+    setTimeout(this.showWelcome.bind(this), 2000)
+  }
+
+  private showLoose() {
+    this.painter.clearCanvas(this.settings.CANVAS_WIDTH, this.settings.CANVAS_HEIGHT)
+    new LooseScreen(this.painter, this.settings).show()
+    setTimeout(this.showWelcome.bind(this), 2000)
+  }
 }
 
-function createLevel(painter: Painter, settings: Settings) {
+function createLevel(painter: Painter, settings: Settings, onWin?, onLoose?) {
   const bricksInRow = 6
   const gap = Math.round((settings.CANVAS_WIDTH - bricksInRow * settings.BRICK_WIDTH) / (bricksInRow + 1))
   const ROWS = 4
@@ -95,6 +133,8 @@ function createLevel(painter: Painter, settings: Settings) {
   return new GameLevel(
     bricks,
     painter,
-    settings
+    settings,
+    onWin,
+    onLoose
   )
 }
